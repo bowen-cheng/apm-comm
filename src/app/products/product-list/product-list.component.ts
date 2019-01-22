@@ -1,5 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { NgModel } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 
 import { IProduct } from '../product';
 import { ProductService } from '../product.service';
@@ -8,9 +7,8 @@ import { ProductService } from '../product.service';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit, AfterViewInit {
+export class ProductListComponent implements OnInit {
   pageTitle: string = 'Product List';
-  listFilter: string;
   showImage: boolean;
 
   imageWidth: number = 50;
@@ -20,28 +18,6 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   filteredProducts: IProduct[];
   products: IProduct[];
 
-  // $$: We use NgModel here because we would like to access the "valueChanges" property on NgModel
-  @ViewChild(NgModel) filterElementRef: NgModel;
-  // @ViewChild('filterElement') filterElementRef: NgModel;
-
-  // $$: Two ways of retrieving ViewChildren
-  // @ViewChildren(NgModel) inputElementRefs: QueryList<ElementRef>;
-  @ViewChildren('filterElement, nameElement') inputElementRefs: QueryList<ElementRef>;
-
-  /*
-  private _listFilter: string;
-
-  get listFilter(): string {
-    return this._listFilter;
-  }
-
-  // $$: call filter function on value change
-  set listFilter(value: string) {
-    this._listFilter = value;
-    this.performFilter(this.listFilter);
-  }
-  */
-
   constructor(private productService: ProductService) {
   }
 
@@ -49,18 +25,10 @@ export class ProductListComponent implements OnInit, AfterViewInit {
     this.productService.getProducts().subscribe(
       (products: IProduct[]) => {
         this.products = products;
-        this.performFilter(this.listFilter);
+        this.performFilter();
       },
-      (error: any) => this.errorMessage = <any>error
+      (error: any) => this.errorMessage = error as any
     );
-  }
-
-  // $$: View child is available on ngAfterViewInit
-  ngAfterViewInit(): void {
-    // this.filterElementRef.nativeElement.focus();
-    this.filterElementRef.valueChanges.subscribe((value) => this.onFilterChange(value));
-
-    console.log(this.inputElementRefs);
   }
 
   toggleImage(): void {
@@ -75,10 +43,4 @@ export class ProductListComponent implements OnInit, AfterViewInit {
       this.filteredProducts = this.products;
     }
   }
-
-  onFilterChange(filterString: string): void {
-    this.listFilter = filterString;
-    this.performFilter(this.listFilter);
-  }
-
 }
