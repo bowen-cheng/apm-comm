@@ -1,4 +1,6 @@
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren
+} from '@angular/core';
 import { NgModel } from '@angular/forms';
 
 @Component({
@@ -6,7 +8,11 @@ import { NgModel } from '@angular/forms';
   templateUrl: './criteria.component.html',
   styleUrls: ['./criteria.component.css']
 })
-export class CriteriaComponent implements OnInit, AfterViewInit {
+export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
+
+  @Input() displayCriteria: boolean;
+  @Input() hitCount: number;
+  protected hitMessage: string;
 
   // $$: We use NgModel here because we would like to access the "valueChanges" property on NgModel
   @ViewChild(NgModel) filterElementRef: NgModel;
@@ -38,8 +44,24 @@ export class CriteriaComponent implements OnInit, AfterViewInit {
   // $$: View child is available on ngAfterViewInit
   ngAfterViewInit(): void {
     // this.filterElementRef.nativeElement.focus();
-    this.filterElementRef.valueChanges.subscribe(/* perform filter */);
+    this.filterElementRef.valueChanges.subscribe(/* perform filter */() => {});
 
-    console.log(this.inputElementRefs);
+    console.log('@ViewChildren("filterElement, nameElement")', this.inputElementRefs);
   }
+
+  /**
+   * $$: Gets called if any @Input() property is changed. It only works with @Input() decorator
+   *
+   * @param changes: A key-value pairs of changes made to any of the @Input() properties
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    console.log('ngOnChanges called', changes);
+
+    if (changes.hitCount && !changes.hitCount.currentValue) {
+      this.hitMessage = 'No matches found';
+    } else {
+      this.hitMessage = `Hits: ${this.hitCount}`;
+    }
+  }
+
 }
