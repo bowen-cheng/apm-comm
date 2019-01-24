@@ -13,6 +13,7 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() displayCriteria: boolean;
   @Input() hitCount: number;
   protected hitMessage: string;
+  listFilter: string = 'cart';
 
   // $$: We use NgModel here because we would like to access the "valueChanges" property on NgModel
   @ViewChild(NgModel) filterElementRef: NgModel;

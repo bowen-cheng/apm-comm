@@ -7,10 +7,13 @@
     <!-- Filter by the Title   -->
     <div class="row">
       <pm-criteria
+        #filterCriteria
         class="col-md-10"
         [displayCriteria]="includeDetail"
         [hitCount]="filteredProducts?.length">
       </pm-criteria>
+      <!-- $$: Parent component can access properties/functions of child component via a template reference variable -->
+      {{ filterCriteria.listFilter }}
     </div>
 
     <div class='table-responsive'>

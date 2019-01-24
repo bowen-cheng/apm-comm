@@ -4,7 +4,7 @@
     <!-- $$: Full syntax of two-way binding with ngModel, we can call custom function on (ngModelChange) -->
     <!--<input type='text' [ngModel]='listFilter' (ngModelChange)="onFilterChange($event)"/>-->
 
-    <!-- $$: listFilter is actually a pair of getter and setter, we can call custom function on setter -->
+    <!-- $$: listFilter can be a pair of getter and setter. We can call custom function on setter -->
     <input type='text' #filterElement [(ngModel)]='listFilter'/>
   </div>
   <!--
