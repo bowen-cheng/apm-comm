@@ -1,5 +1,6 @@
 import {
-  AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges,
+  ViewChild, ViewChildren
 } from '@angular/core';
 import { NgModel } from '@angular/forms';
 
@@ -13,7 +14,7 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() displayCriteria: boolean;
   @Input() hitCount: number;
   protected hitMessage: string;
-  listFilter: string = 'cart';
+  @Output() valueChange: EventEmitter<string> = new EventEmitter();
 
   // $$: We use NgModel here because we would like to access the "valueChanges" property on NgModel
   @ViewChild(NgModel) filterElementRef: NgModel;
@@ -23,19 +24,17 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
   // @ViewChildren(NgModel) inputElementRefs: QueryList<ElementRef>;
   @ViewChildren('filterElement, nameElement') inputElementRefs: QueryList<ElementRef>;
 
-  /*
   private _listFilter: string;
 
   get listFilter(): string {
     return this._listFilter;
   }
 
-  // $$: call filter function on value change
+  // $$: Notify parent on filter value change
   set listFilter(value: string) {
     this._listFilter = value;
-    this.performFilter(this.listFilter);
+    this.valueChange.emit(value);
   }
-  */
 
   constructor() { }
 
@@ -61,7 +60,7 @@ export class CriteriaComponent implements OnInit, AfterViewInit, OnChanges {
     if (changes.hitCount && !changes.hitCount.currentValue) {
       this.hitMessage = 'No matches found';
     } else {
-      this.hitMessage = `Hits: ${this.hitCount}`;
+      this.hitMessage = `Hits: ${ this.hitCount }`;
     }
   }
 
