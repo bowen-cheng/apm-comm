@@ -11,7 +11,7 @@
         class="col-md-10"
         [displayCriteria]="includeDetail"
         [hitCount]="filteredProducts?.length"
-        (valueChange)="performFilter($event)">
+        (valueChange)="onValueChange($event)">
       </pm-criteria>
       <!-- $$: Parent component can access properties/functions of child component via a template reference variable -->
       {{ filterCriteria.listFilter }}

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { CriteriaComponent } from '../../shared/criteria/criteria.component';
 
 import { IProduct } from '../product';
+import { ProductParameterService } from '../product-parameter.service';
 import { ProductService } from '../product.service';
 
 @Component({
@@ -10,7 +11,6 @@ import { ProductService } from '../product.service';
 })
 export class ProductListComponent implements OnInit, AfterViewInit {
   pageTitle: string = 'Product List';
-  showImage: boolean;
   includeDetail: boolean = true;
 
   imageWidth: number = 50;
@@ -23,14 +23,23 @@ export class ProductListComponent implements OnInit, AfterViewInit {
   parentListFilter: string;
   @ViewChild(CriteriaComponent) filterComponent: CriteriaComponent;
 
-  constructor(private productService: ProductService) {
+  get showImage(): boolean {
+    return this.productParameterService.showImage;
+  }
+
+  set showImage(value: boolean) {
+    this.productParameterService.showImage = value;
+  }
+
+  constructor(private productService: ProductService, private productParameterService: ProductParameterService) {
   }
 
   ngOnInit(): void {
     this.productService.getProducts().subscribe(
       (products: IProduct[]) => {
         this.products = products;
-        this.performFilter(this.parentListFilter);
+        // $$: Initialize the filter in the child component according to the value stored in the property bag service
+        this.filterComponent.listFilter = this.productParameterService.filterBy;
       },
       (error: any) => this.errorMessage = error as any
     );
@@ -43,6 +52,12 @@ export class ProductListComponent implements OnInit, AfterViewInit {
 
   toggleImage(): void {
     this.showImage = !this.showImage;
+  }
+
+  onValueChange(value: string): void {
+    // $$: store the new value into the property bag service
+    this.productParameterService.filterBy = this.filterComponent.listFilter;
+    this.performFilter(value);
   }
 
   performFilter(filterBy?: string): void {
