@@ -9,6 +9,7 @@ import { IProduct } from './product';
 @Injectable()
 export class ProductService {
   private productsUrl = 'api/products';
+  private products: IProduct[];
 
   static initializeProduct(): IProduct {
     // Return an initialized object
@@ -46,9 +47,13 @@ export class ProductService {
   }
 
   getProducts(): Observable<IProduct[]> {
+    if (this.products) {
+      return of(this.products);
+    }
     return this.http.get<IProduct[]>(this.productsUrl)
       .pipe(
-        tap(data => console.log(JSON.stringify(data))),
+        tap(data => console.log('All products retrieved:', JSON.stringify(data))),
+        tap(data => this.products = data),
         catchError(ProductService.handleError)
       );
   }
@@ -57,10 +62,16 @@ export class ProductService {
     if (id === 0) {
       return of(ProductService.initializeProduct());
     }
+    if (this.products) {
+      const productFound = this.products.find(product => product.id === id);
+      if (productFound) {
+        return of(productFound);
+      }
+    }
     const url = `${ this.productsUrl }/${ id }`;
     return this.http.get<IProduct>(url)
       .pipe(
-        tap(data => console.log('Data: ' + JSON.stringify(data))),
+        tap(data => console.log('Single product retrieved: ' + JSON.stringify(data))),
         catchError(ProductService.handleError)
       );
   }
@@ -80,15 +91,21 @@ export class ProductService {
     return this.http.delete<IProduct>(url, { headers })
       .pipe(
         tap(() => console.log('deleteProduct: ' + id)),
+        tap((data: IProduct) => {
+            const index = this.products.indexOf(data);
+            this.products.splice(index, 1);
+          }
+        ),
         catchError(ProductService.handleError)
       );
   }
 
   private createProduct(product: IProduct, headers: HttpHeaders): Observable<IProduct> {
-    product.id = null;
-    return this.http.post<IProduct>(this.productsUrl, product, { headers})
+    product.id = null; // needed by In memory API to correctly assign a new ID
+    return this.http.post<IProduct>(this.productsUrl, product, { headers })
       .pipe(
         tap(data => console.log('createProduct: ' + JSON.stringify(data))),
+        tap(data => this.products.push(data)),
         catchError(ProductService.handleError)
       );
   }
