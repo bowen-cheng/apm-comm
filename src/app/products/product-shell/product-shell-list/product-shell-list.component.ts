@@ -26,7 +26,10 @@ export class ProductShellListComponent implements OnInit {
 
   OnProductSelect(product: IProduct) {
     // $$: Push the change to the state management service
-    this.productService.currentProduct = product;
+    // this.productService.currentProduct = product;
+
+    // $$: Push the change to the subject, it will then automatically update all the subscribers
+    this.productService.changeSelectedProduct(product);
   }
 
 }

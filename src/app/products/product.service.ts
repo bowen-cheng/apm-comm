@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, of, Subject, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { IProduct } from './product';
@@ -10,7 +10,10 @@ import { IProduct } from './product';
 export class ProductService {
   private productsUrl = 'api/products';
   private products: IProduct[];
-  currentProduct: IProduct | null;
+  private productSource = new Subject<IProduct | null>();
+  productChanges$ = this.productSource.asObservable();
+
+  // currentProduct: IProduct | null;
 
   static initializeProduct(): IProduct {
     // Return an initialized object
@@ -45,6 +48,10 @@ export class ProductService {
   }
 
   constructor(private http: HttpClient) {
+  }
+
+  changeSelectedProduct(value: IProduct | null) {
+    this.productSource.next(value);
   }
 
   getProducts(): Observable<IProduct[]> {
@@ -95,7 +102,8 @@ export class ProductService {
         tap(() => {
             const index = this.products.findIndex(product => product.id === id);
             if (index !== -1) {
-              this.currentProduct = null;
+              // this.currentProduct = null;
+              this.changeSelectedProduct(null);
               this.products.splice(index, 1);
             }
           }
@@ -111,7 +119,8 @@ export class ProductService {
         tap(data => console.log('createProduct: ' + JSON.stringify(data))),
         tap(data => {
           this.products.push(data);
-          this.currentProduct = data;
+          // this.currentProduct = data;
+          this.changeSelectedProduct(data);
         }),
         catchError(ProductService.handleError)
       );
