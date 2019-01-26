@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
-import { Observable, of, Subject, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 import { IProduct } from './product';
@@ -10,7 +10,13 @@ import { IProduct } from './product';
 export class ProductService {
   private productsUrl = 'api/products';
   private products: IProduct[];
-  private productSource = new Subject<IProduct | null>();
+
+  // $$: A subject DOES NOT REQUIRE an initial value. It DOESN'T BROADCAST current value on new subscriptions
+  // private productSource = new Subject<IProduct | null>();
+
+  // $$: A BehaviorSubject REQUIRES an initial value. It BROADCASTS current value on new subscriptions
+  private productSource = new BehaviorSubject<IProduct | null>(null);
+
   productChanges$ = this.productSource.asObservable();
 
   // currentProduct: IProduct | null;
