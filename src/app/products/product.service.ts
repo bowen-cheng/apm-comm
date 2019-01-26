@@ -10,6 +10,7 @@ import { IProduct } from './product';
 export class ProductService {
   private productsUrl = 'api/products';
   private products: IProduct[];
+  currentProduct: IProduct | null;
 
   static initializeProduct(): IProduct {
     // Return an initialized object
@@ -91,9 +92,12 @@ export class ProductService {
     return this.http.delete<IProduct>(url, { headers })
       .pipe(
         tap(() => console.log('deleteProduct: ' + id)),
-        tap((data: IProduct) => {
-            const index = this.products.indexOf(data);
-            this.products.splice(index, 1);
+        tap(() => {
+            const index = this.products.findIndex(product => product.id === id);
+            if (index !== -1) {
+              this.currentProduct = null;
+              this.products.splice(index, 1);
+            }
           }
         ),
         catchError(ProductService.handleError)
@@ -105,7 +109,10 @@ export class ProductService {
     return this.http.post<IProduct>(this.productsUrl, product, { headers })
       .pipe(
         tap(data => console.log('createProduct: ' + JSON.stringify(data))),
-        tap(data => this.products.push(data)),
+        tap(data => {
+          this.products.push(data);
+          this.currentProduct = data;
+        }),
         catchError(ProductService.handleError)
       );
   }

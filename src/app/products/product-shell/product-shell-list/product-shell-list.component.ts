@@ -20,8 +20,13 @@ export class ProductShellListComponent implements OnInit {
       (products: IProduct[]) => {
         this.products = products;
       },
-      (error: any) => this.errorMessage = <any>error
+      (error: any) => this.errorMessage = error as any
     );
+  }
+
+  OnProductSelect(product: IProduct) {
+    // $$: Push the change to the state management service
+    this.productService.currentProduct = product;
   }
 
 }
