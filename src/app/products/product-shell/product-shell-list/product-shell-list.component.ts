@@ -8,9 +8,10 @@ import { ProductService } from '../../product.service';
   templateUrl: './product-shell-list.component.html'
 })
 export class ProductShellListComponent implements OnInit {
-  pageTitle: string = 'Products';
-  errorMessage: string;
-  products: IProduct[];
+  protected pageTitle: string = 'Products';
+  protected errorMessage: string;
+  protected products: IProduct[];
+  protected selectedProduct: IProduct | null;
 
   constructor(private productService: ProductService) {
   }
@@ -22,6 +23,12 @@ export class ProductShellListComponent implements OnInit {
       },
       (error: any) => this.errorMessage = error as any
     );
+
+    // $$: Subscribe to the BehaviorSubject to receive current values and any new values
+    this.productService.productChanges$.subscribe(
+      (product: IProduct | null) => {
+        this.selectedProduct = product;
+      });
   }
 
   OnProductSelect(product: IProduct) {
