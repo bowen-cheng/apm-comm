@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { IProduct } from '../../product';
 import { ProductService } from '../../product.service';
 
@@ -6,9 +7,10 @@ import { ProductService } from '../../product.service';
   selector: 'pm-product-shell-detail',
   templateUrl: './product-shell-detail.component.html'
 })
-export class ProductShellDetailComponent implements OnInit {
+export class ProductShellDetailComponent implements OnInit, OnDestroy {
   protected pageTitle: string = 'Product Detail';
   protected product: IProduct | null;
+  protected sub: Subscription;
 
   /*
   get product(): IProduct | null {
@@ -22,10 +24,14 @@ export class ProductShellDetailComponent implements OnInit {
 
   ngOnInit() {
     // $$: Subscribe to productChanges to get notified and automatically get the latest selected product
-    this.productService.productChanges$.subscribe(
+    this.sub = this.productService.productChanges$.subscribe(
       (selectedProduct: IProduct | null) => {
         this.product = selectedProduct;
       });
+  }
+
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
   }
 
 }
